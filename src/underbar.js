@@ -7,6 +7,7 @@
   // seem very useful, but remember it--if a function needs to provide an
   // iterator when the user does not pass one in, this will be handy.
   _.identity = function(val) {
+    return val
   };
 
   /**
@@ -37,6 +38,13 @@
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
+    var result;
+
+    if( n === undefined){result = array[array.length-1]}
+    else if ( n === 0 ){result = array.slice(0,0)}
+    else {result = array.slice ( -n, array.length)};
+    
+    return result
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -45,6 +53,18 @@
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
   _.each = function(collection, iterator) {
+    
+      if ( Array.isArray(collection)){
+        for( var i = 0; i<collection.length; i++){
+          iterator(collection[i],i,collection);
+        }
+      }
+      else { 
+        for( var keys in collection){
+          iterator(collection[keys],keys,collection);
+        }
+      }
+
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -66,16 +86,45 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+
+    var output = [];
+
+      for(var i = 0; i<collection.length; i++){
+        if(test(collection[i]) === true ){ output.push(collection[i]) }
+      }
+    return output
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    var output = [];
+
+      for(var i = 0; i<collection.length; i++){
+        if(test(collection[i]) === false ){ output.push(collection[i]) }
+        else { }
+      }
+    return output
+
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
+
+    var output =[];
+
+    for(var i = 0; i<array.length; i++){
+      for(var k = i+1; k<array.length; k++){
+
+        if(array[i] === array[k]){array.splice(k,1);}
+        else{}
+      }
+      output.push(array[i]);
+    }
+
+    return output
+    
   };
 
 
@@ -84,6 +133,20 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    // var output = [];
+    var output = [];
+      
+      if( Array.isArray(collection)){
+        for( var i = 0; i<collection.length; i++){
+          output.push(iterator(collection[i],i,collection));
+        }
+      }
+      else { 
+        for( var keys in collection){
+          output.push(iterator(collection[keys],keys,collection));
+        }
+      }
+    return output
   };
 
   /*
@@ -125,6 +188,24 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+
+       if ( Array.isArray(collection)){
+        for( var i = 0; i<collection.length; i++){
+          if(accumulator === undefined){
+            accumulator = collection[i];
+          }
+          else{accumulator = iterator(accumulator,collection[i]);}
+        }
+      }
+      else { 
+        for( var keys in collection){
+          if(accumulator === undefined){
+            accumulator = collection[keys];
+          }
+          else{accumulator = iterator(accumulator,collection[keys]);}
+        }
+      }    
+    return accumulator    
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -143,12 +224,71 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
-  };
+
+    if(iterator === undefined){
+      if(Array.isArray(collection)){
+              for (var i = 0; i<collection.length; i++){
+                if(true&&collection[i]){}
+                else{return false}              
+              }
+        }else{
+              for(var keys in collection){
+                if(true&&collection[keys]){}
+                else{return false}
+              }
+        }
+    }
+    else{  
+        if(Array.isArray(collection)){
+              for (var i = 0; i<collection.length; i++){
+                if(true&&iterator(collection[i])){}
+                else{return false}
+              }
+        }else{
+              for(var keys in collection){
+                if(true&&iterator(collection[keys])){}
+                else{return false}
+              }
+        }
+    }
+     return true;
+
+  };  
+
+
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    // 
+    if(iterator === undefined){
+      if(Array.isArray(collection)){
+              for (var i = 0; i<collection.length; i++){
+                if(true&&collection[i]){return true}
+                else{}              
+              }
+        }else{
+              for(var keys in collection){
+                if(true&&collection[keys]){return true}
+                else{}
+              }
+        }
+    }
+    else{    
+        if(Array.isArray(collection)){
+              for (var i = 0; i<collection.length; i++){
+                if(true&&iterator(collection[i])){return true}
+                else{}
+              }
+        }else{
+              for(var keys in collection){
+                if(true&&iterator(collection[keys])){return true}
+                else{}
+              }
+        }
+    }
+     return false;
   };
 
 
@@ -171,6 +311,8 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+
+    
   };
 
   // Like extend, but doesn't ever overwrite a key that already
