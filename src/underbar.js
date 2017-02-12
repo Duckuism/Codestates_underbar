@@ -90,7 +90,7 @@
     var output = [];
 
       for(var i = 0; i<collection.length; i++){
-        if(test(collection[i]) === true ){ output.push(collection[i]) }
+        if(test(collection[i])){ output.push(collection[i]) }
       }
     return output
   };
@@ -117,8 +117,7 @@
     for(var i = 0; i<array.length; i++){
       for(var k = i+1; k<array.length; k++){
 
-        if(array[i] === array[k]){array.splice(k,1);}
-        else{}
+        if(array[i] === array[k]){array.splice(k,1); k--;}
       }
       output.push(array[i]);
     }
@@ -312,12 +311,25 @@
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
 
-    
+    for(var i = 0; i<arguments.length; i++){
+      for(var key in arguments[i]){
+          arguments[0][key]  = arguments[i][key];
+      }
+    }
+return arguments[0]                                      
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    for(var i = 0; i<arguments.length; i++){
+      for(var key in arguments[i]){
+        if(arguments[0][key]  === undefined){
+          arguments[0][key] = arguments[i][key];
+        }
+      }
+    }
+    return arguments[0]     
   };
 
 
@@ -354,13 +366,35 @@
 
   // Memorize an expensive function's results by storing them. You may assume
   // that the function takes only one argument and that it is a primitive.
-  // memoize could be renamed to oncePerUniqueArgumentList; memoize does the
+  // memoize could be renamed to oncePerUnopiqueArgumentList; memoize does the
   // same thing as once, but based on many sets of unique arguments.
   //
   // _.memoize should return a function that, when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+
+    var result ;
+    var cache = {};
+
+      return  function(){
+        var funcval = JSON.stringify(arguments);
+        // func가 return된 형태로 들어오는가, 함수명(매개변수) 형태로 들어오는가?
+        // 함수를 매개변수로 받을 때 arguments의 정확한 형태가 궁금하다.
+        if(cache[funcval]){
+        //cache에서 'func(parameter)'로 접근
+        //아니면 'func(parameter)의 리턴값'으로 접근?
+          return cache[funcval];
+        }else {
+          result = func.apply(this,arguments);
+          cache[funcval] = result;
+          //cache = {'func(parameter)' : result}
+          //아니면 {'func(parameter)의 리턴값' : result}?
+        }
+        return result;
+      };
+
+
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -370,6 +404,16 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+
+      var a = Array.prototype.slice.call(arguments);
+      a.shift();
+      a.shift();
+
+     setTimeout(function(){
+      return func.apply(this,a);
+      },wait);
+
+
   };
 
 
@@ -384,6 +428,17 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+
+    var newArr = Array.prototype.slice.call(array);
+
+  for (var i = newArr.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = newArr[i];
+        newArr[i] = newArr[j];
+        newArr[j] = temp;
+    }
+    return newArr;
+
   };
 
 
